@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aura Stats</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+    font-family: 'Arial', sans-serif;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  .stars {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s infinite alternate;
+  }
+  @keyframes twinkle {
+    0% { opacity: 0.2; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.3); }
+  }
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 10px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: bold;
+    background: linear-gradient(90deg, #a78bfa, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 4px;
+  }
+  .header p {
+    font-size: 14px;
+    color: #9ca3af;
+  }
+  .avg-card {
+    background: linear-gradient(135deg, #6c63ff, #ec4899);
+    border-radius: 24px;
+    padding: 30px;
+    text-align: center;
+    margin-bottom: 24px;
+    box-shadow: 0 20px 60px rgba(108, 99, 255, 0.4);
+  }
+  .avg-label {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .avg-number {
+    font-size: 80px;
+    font-weight: bold;
+    line-height: 1;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .avg-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 8px;
+  }
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-box {
+    flex: 1;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  .stat-box .val {
+    font-size: 24px;
+    font-weight: bold;
+    color: #a78bfa;
+  }
+  .stat-box .lbl {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 4px;
+  }
+  .chart-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    margin-bottom: 24px;
+  }
+  .chart-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #e2e8f0;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .aura-bar {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+  }
+  .aura-label {
+    font-size: 14px;
+    color: #9ca3af;
+    margin-bottom: 8px;
+  }
+  .aura-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #a78bfa;
+    margin-bottom: 12px;
+  }
+  .aura-value span {
+    font-size: 16px;
+    color: #6b7280;
+  }
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6c63ff, #ec4899);
+    border-radius: 4px;
+    transition: width 1.5s ease;
+  }
+  .username {
+    font-size: 18px;
+    color: #e2e8f0;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <div class="header">
+    <h1>✨ AURA STATS</h1>
+    <p class="username" id="username">@пользователь</p>
+  </div>
+
+  <div class="avg-card">
+    <div class="avg-label">средняя оценка</div>
+    <div class="avg-number" id="avgScore">—</div>
+    <div class="avg-sub">из 10</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="val" id="totalRatings">0</div>
+      <div class="lbl">оценок</div>
+    </div>
+    <div class="stat-box">
+      <div class="val" id="maxScore">—</div>
+      <div class="lbl">лучшая</div>
+    </div>
+    <div class="stat-box">
+      <div class="val" id="minScore">—</div>
+      <div class="lbl">худшая</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">📊 История оценок</div>
+    <canvas id="ratingsChart" height="160"></canvas>
+  </div>
+
+  <div class="aura-bar">
+    <div class="aura-label">✨ Всего aura points</div>
+    <div class="aura-value" id="auraPoints">0 <span>aura points</span></div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Создаём звёзды на фоне
+const starsContainer = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+  const star = document.createElement('div');
+  star.classList.add('star');
+  const size = Math.random() * 3 + 1;
+  star.style.width = size + 'px';
+  star.style.height = size + 'px';
+  star.style.left = Math.random() * 100 + '%';
+  star.style.top = Math.random() * 100 + '%';
+  star.style.animationDelay = Math.random() * 3 + 's';
+  star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+  starsContainer.appendChild(star);
+}
+
+// Инициализация Telegram Web App
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+
+// Получаем данные пользователя из Telegram
+const user = tg.initDataUnsafe?.user;
+if (user) {
+  document.getElementById('username').textContent = '@' + (user.username || user.first_name);
+}
+
+// Получаем данные из URL параметров (бот передаёт их)
+const params = new URLSearchParams(window.location.search);
+const ratings = params.get('ratings') ? params.get('ratings').split(',').map(Number) : [];
+const aura = parseFloat(params.get('aura')) || 0;
+const username = params.get('username') || '';
+
+if (username) {
+  document.getElementById('username').textContent = '@' + username;
+}
+
+// Заполняем статистику
+if (ratings.length > 0) {
+  const avg = (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1);
+  const max = Math.max(...ratings);
+  const min = Math.min(...ratings);
+
+  document.getElementById('avgScore').textContent = avg;
+  document.getElementById('totalRatings').textContent = ratings.length;
+  document.getElementById('maxScore').textContent = max;
+  document.getElementById('minScore').textContent = min;
+  document.getElementById('auraPoints').innerHTML = aura + ' <span>aura points</span>';
+
+  // Прогресс бар (максимум 1000 очков)
+  const progress = Math.min((aura / 1000) * 100, 100);
+  setTimeout(() => {
+    document.getElementById('progressFill').style.width = progress + '%';
+  }, 300);
+
+  // График
+  const last20 = ratings.slice(-20);
+  const labels = last20.map((_, i) => '#' + (ratings.length - last20.length + i + 1));
+
+  const colors = last20.map(r => {
+    if (r >= 8) return 'rgba(167, 139, 250, 0.9)';
+    if (r >= 6) return 'rgba(108, 99, 255, 0.9)';
+    if (r >= 4) return 'rgba(236, 72, 153, 0.7)';
+    return 'rgba(107, 114, 128, 0.7)';
+  });
+
+  const ctx = document.getElementById('ratingsChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: last20,
+        backgroundColor: colors,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          min: 0, max: 10,
+          ticks: { color: '#9ca3af', stepSize: 2 },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+        },
+        x: {
+          ticks: { color: '#9ca3af', font: { size: 10 } },
+          grid: { display: false },
+        }
+      }
+    }
+  });
+} else {
+  // Демо данные если нет реальных
+  document.getElementById('avgScore').textContent = '—';
+  document.getElementById('totalRatings').textContent = '0';
+  document.getElementById('maxScore').textContent = '—';
+  document.getElementById('minScore').textContent = '—';
+
+  const ctx = document.getElementById('ratingsChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Нет данных'],
+      datasets: [{ data: [0], backgroundColor: 'rgba(108,99,255,0.3)', borderRadius: 6 }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min: 0, max: 10, ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
