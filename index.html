@@ -7,162 +7,360 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
-    font-family: 'Arial', sans-serif;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
-  .stars {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .star {
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-    animation: twinkle 3s infinite alternate;
-  }
-  @keyframes twinkle {
-    0% { opacity: 0.2; transform: scale(1); }
-    100% { opacity: 1; transform: scale(1.3); }
-  }
-  .container {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 400px;
-  }
-  .header {
-    text-align: center;
-    margin-bottom: 30px;
-    margin-top: 10px;
-  }
-  .header h1 {
-    font-size: 28px;
-    font-weight: bold;
-    background: linear-gradient(90deg, #a78bfa, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 4px;
-  }
-  .header p {
-    font-size: 14px;
-    color: #9ca3af;
-  }
-  .avg-card {
-    background: linear-gradient(135deg, #6c63ff, #ec4899);
-    border-radius: 24px;
-    padding: 30px;
-    text-align: center;
-    margin-bottom: 24px;
-    box-shadow: 0 20px 60px rgba(108, 99, 255, 0.4);
-  }
-  .avg-label {
-    font-size: 14px;
-    color: rgba(255,255,255,0.8);
-    margin-bottom: 8px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-  .avg-number {
-    font-size: 80px;
-    font-weight: bold;
-    line-height: 1;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  }
-  .avg-sub {
-    font-size: 16px;
-    color: rgba(255,255,255,0.7);
-    margin-top: 8px;
-  }
-  .stats-row {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-  .stat-box {
-    flex: 1;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 16px;
-    padding: 16px;
-    text-align: center;
-    backdrop-filter: blur(10px);
-  }
-  .stat-box .val {
-    font-size: 24px;
-    font-weight: bold;
-    color: #a78bfa;
-  }
-  .stat-box .lbl {
-    font-size: 12px;
-    color: #9ca3af;
-    margin-top: 4px;
-  }
-  .chart-card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 20px;
-    backdrop-filter: blur(10px);
-    margin-bottom: 24px;
-  }
-  .chart-title {
-    font-size: 16px;
-    font-weight: bold;
-    color: #e2e8f0;
-    margin-bottom: 16px;
-    text-align: center;
-  }
-  .aura-bar {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 20px;
-    backdrop-filter: blur(10px);
-  }
-  .aura-label {
-    font-size: 14px;
-    color: #9ca3af;
-    margin-bottom: 8px;
-  }
-  .aura-value {
-    font-size: 32px;
-    font-weight: bold;
-    color: #a78bfa;
-    margin-bottom: 12px;
-  }
-  .aura-value span {
-    font-size: 16px;
-    color: #6b7280;
-  }
-  .progress-bar {
-    width: 100%;
-    height: 8px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #6c63ff, #ec4899);
-    border-radius: 4px;
-    transition: width 1.5s ease;
-  }
-  .username {
-    font-size: 18px;
-    color: #e2e8f0;
-    font-weight: bold;
-  }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+  font-family: 'Arial', sans-serif;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px 40px;
+  overflow-x: hidden;
+}
+
+.stars {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s infinite alternate;
+}
+@keyframes twinkle {
+  0% { opacity: 0.2; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.4); }
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Анимация появления */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeUp 0.6s ease forwards;
+}
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up:nth-child(1) { animation-delay: 0.1s; }
+.fade-up:nth-child(2) { animation-delay: 0.2s; }
+.fade-up:nth-child(3) { animation-delay: 0.3s; }
+.fade-up:nth-child(4) { animation-delay: 0.4s; }
+.fade-up:nth-child(5) { animation-delay: 0.5s; }
+.fade-up:nth-child(6) { animation-delay: 0.6s; }
+.fade-up:nth-child(7) { animation-delay: 0.7s; }
+
+/* Шапка */
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+  margin-top: 10px;
+}
+.header h1 {
+  font-size: 26px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #a78bfa, #ec4899, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 4px;
+}
+.header .username {
+  font-size: 15px;
+  color: #9ca3af;
+}
+
+/* Карточка средней оценки */
+.avg-card {
+  background: linear-gradient(135deg, #6c63ff, #ec4899);
+  border-radius: 28px;
+  padding: 28px 20px;
+  text-align: center;
+  margin-bottom: 16px;
+  box-shadow: 0 0 40px rgba(108, 99, 255, 0.5), 0 0 80px rgba(236, 72, 153, 0.2);
+  position: relative;
+  overflow: hidden;
+  animation: pulse-glow 3s infinite alternate;
+}
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 30px rgba(108,99,255,0.4), 0 0 60px rgba(236,72,153,0.15); }
+  100% { box-shadow: 0 0 60px rgba(108,99,255,0.7), 0 0 100px rgba(236,72,153,0.35); }
+}
+.avg-card::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+  animation: rotate 8s linear infinite;
+}
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.avg-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.75);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  position: relative;
+}
+.avg-number {
+  font-size: 88px;
+  font-weight: bold;
+  line-height: 1;
+  text-shadow: 0 4px 30px rgba(0,0,0,0.4);
+  position: relative;
+}
+.avg-sub {
+  font-size: 15px;
+  color: rgba(255,255,255,0.65);
+  margin-top: 6px;
+  position: relative;
+}
+
+/* Статистика */
+.stats-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.stat-box {
+  flex: 1;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  padding: 14px 8px;
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+.stat-box .val {
+  font-size: 22px;
+  font-weight: bold;
+  color: #a78bfa;
+}
+.stat-box .lbl {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 3px;
+}
+
+/* Последние оценки */
+.recent-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 16px;
+  backdrop-filter: blur(12px);
+  margin-bottom: 16px;
+}
+.recent-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #9ca3af;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.recent-items {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.recent-item {
+  background: rgba(108,99,255,0.2);
+  border: 1px solid rgba(108,99,255,0.3);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #a78bfa;
+}
+.recent-item.high { background: rgba(167,139,250,0.25); border-color: rgba(167,139,250,0.4); color: #c4b5fd; }
+.recent-item.low { background: rgba(107,114,128,0.2); border-color: rgba(107,114,128,0.3); color: #9ca3af; }
+
+/* График */
+.chart-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 18px;
+  backdrop-filter: blur(12px);
+  margin-bottom: 16px;
+}
+.chart-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #9ca3af;
+  margin-bottom: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Процент 6+ */
+.percent-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 16px 18px;
+  backdrop-filter: blur(12px);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.percent-label {
+  font-size: 13px;
+  color: #9ca3af;
+}
+.percent-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #34d399;
+}
+
+/* Шкала уровней */
+.level-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 18px;
+  backdrop-filter: blur(12px);
+  margin-bottom: 16px;
+}
+.level-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.level-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #9ca3af;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.level-badge {
+  font-size: 13px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.level-badge.novice { background: rgba(107,114,128,0.3); color: #9ca3af; }
+.level-badge.handsome { background: rgba(108,99,255,0.3); color: #a78bfa; }
+.level-badge.legend { background: rgba(245,158,11,0.3); color: #f59e0b; }
+
+.level-track {
+  position: relative;
+  height: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  margin-bottom: 10px;
+  overflow: visible;
+}
+.level-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #6c63ff, #ec4899, #f59e0b);
+  transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+}
+.level-fill::after {
+  content: '';
+  position: absolute;
+  right: -1px; top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(108,99,255,0.8);
+}
+.level-marks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #6b7280;
+}
+
+/* Aura points */
+.aura-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 18px;
+  backdrop-filter: blur(12px);
+  margin-bottom: 16px;
+}
+.aura-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+.aura-label { font-size: 13px; color: #9ca3af; letter-spacing: 1px; text-transform: uppercase; }
+.aura-value { font-size: 28px; font-weight: bold; color: #a78bfa; }
+.aura-value span { font-size: 13px; color: #6b7280; }
+.progress-bar {
+  width: 100%; height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6c63ff, #ec4899);
+  border-radius: 4px;
+  transition: width 1.5s ease;
+  width: 0%;
+}
+
+/* Кнопка поделиться */
+.share-btn {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #6c63ff, #ec4899);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(108,99,255,0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.5px;
+}
+.share-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 15px rgba(108,99,255,0.3);
+}
+
+/* Конфетти */
+.confetti-piece {
+  position: fixed;
+  width: 8px; height: 8px;
+  border-radius: 2px;
+  animation: confettiFall linear forwards;
+  z-index: 999;
+  pointer-events: none;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
 </style>
 </head>
 <body>
@@ -170,18 +368,18 @@
 <div class="stars" id="stars"></div>
 
 <div class="container">
-  <div class="header">
+  <div class="header fade-up">
     <h1>✨ AURA STATS</h1>
-    <p class="username" id="username">@пользователь</p>
+    <div class="username" id="username">@пользователь</div>
   </div>
 
-  <div class="avg-card">
+  <div class="avg-card fade-up">
     <div class="avg-label">средняя оценка</div>
     <div class="avg-number" id="avgScore">—</div>
     <div class="avg-sub">из 10</div>
   </div>
 
-  <div class="stats-row">
+  <div class="stats-row fade-up">
     <div class="stat-box">
       <div class="val" id="totalRatings">0</div>
       <div class="lbl">оценок</div>
@@ -196,134 +394,234 @@
     </div>
   </div>
 
-  <div class="chart-card">
-    <div class="chart-title">📊 История оценок</div>
-    <canvas id="ratingsChart" height="160"></canvas>
-  </div>
-
-  <div class="aura-bar">
-    <div class="aura-label">✨ Всего aura points</div>
-    <div class="aura-value" id="auraPoints">0 <span>aura points</span></div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  <div class="recent-card fade-up">
+    <div class="recent-title">последние оценки</div>
+    <div class="recent-items" id="recentItems">
+      <div style="color:#6b7280;font-size:13px">Нет оценок</div>
     </div>
   </div>
+
+  <div class="chart-card fade-up">
+    <div class="chart-title">📊 история оценок</div>
+    <canvas id="ratingsChart" height="150"></canvas>
+  </div>
+
+  <div class="percent-card fade-up">
+    <div class="percent-label">👍 Поставили 6 и выше</div>
+    <div class="percent-value" id="percentHigh">0%</div>
+  </div>
+
+  <div class="level-card fade-up">
+    <div class="level-header">
+      <div class="level-title">🏆 уровень ауры</div>
+      <div class="level-badge" id="levelBadge">Новичок</div>
+    </div>
+    <div class="level-track">
+      <div class="level-fill" id="levelFill" style="width:0%"></div>
+    </div>
+    <div class="level-marks">
+      <span>0 — Новичок</span>
+      <span>50 — Красавчик</span>
+      <span>500 — Легенда</span>
+    </div>
+  </div>
+
+  <div class="aura-card fade-up">
+    <div class="aura-top">
+      <div class="aura-label">✨ aura points</div>
+      <div class="aura-value" id="auraPoints">0 <span>pts</span></div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <button class="share-btn fade-up" onclick="shareResult()">
+    🚀 Поделиться результатом
+  </button>
 </div>
 
 <script>
-// Создаём звёзды на фоне
+// Звёзды
 const starsContainer = document.getElementById('stars');
-for (let i = 0; i < 80; i++) {
+for (let i = 0; i < 100; i++) {
   const star = document.createElement('div');
   star.classList.add('star');
-  const size = Math.random() * 3 + 1;
-  star.style.width = size + 'px';
-  star.style.height = size + 'px';
-  star.style.left = Math.random() * 100 + '%';
-  star.style.top = Math.random() * 100 + '%';
-  star.style.animationDelay = Math.random() * 3 + 's';
-  star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+  const size = Math.random() * 2.5 + 0.5;
+  star.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${Math.random()*3+2}s`;
   starsContainer.appendChild(star);
 }
 
-// Инициализация Telegram Web App
-const tg = window.Telegram.WebApp;
-tg.ready();
-tg.expand();
+// Telegram Web App
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+  // Тема
+  if (tg.colorScheme === 'light') {
+    document.body.style.background = 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 40%, #a5b4fc 100%)';
+  }
+}
 
-// Получаем данные пользователя из Telegram
-const user = tg.initDataUnsafe?.user;
+const user = tg?.initDataUnsafe?.user;
 if (user) {
   document.getElementById('username').textContent = '@' + (user.username || user.first_name);
 }
 
-// Получаем данные из URL параметров (бот передаёт их)
+// Параметры из URL
 const params = new URLSearchParams(window.location.search);
-const ratings = params.get('ratings') ? params.get('ratings').split(',').map(Number) : [];
+const ratings = params.get('ratings') ? params.get('ratings').split(',').map(Number).filter(n => !isNaN(n)) : [];
 const aura = parseFloat(params.get('aura')) || 0;
 const username = params.get('username') || '';
+if (username) document.getElementById('username').textContent = '@' + username;
 
-if (username) {
-  document.getElementById('username').textContent = '@' + username;
+// Уровни
+function getLevel(aura) {
+  if (aura >= 500) return { name: '👑 Легенда', cls: 'legend', next: 500, progress: 100 };
+  if (aura >= 50) return { name: '😎 Красавчик', cls: 'handsome', next: 500, progress: ((aura - 50) / 450) * 100 };
+  return { name: '🌱 Новичок', cls: 'novice', next: 50, progress: (aura / 50) * 100 };
 }
 
-// Заполняем статистику
+// Конфетти
+function launchConfetti() {
+  const colors = ['#6c63ff','#ec4899','#f59e0b','#34d399','#a78bfa','#ffffff'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.classList.add('confetti-piece');
+      c.style.cssText = `left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${Math.random()*2+1.5}s;animation-delay:0s;border-radius:${Math.random()>0.5?'50%':'2px'}`;
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 3500);
+    }, i * 40);
+  }
+}
+
+// Поделиться
+function shareResult() {
+  if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
+  const avg = ratings.length > 0 ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : '—';
+  const level = getLevel(aura);
+  const text = `✨ Моя аура: ${avg}/10\n${level.name} | ${aura} aura points\nОценили меня: ${ratings.length} раз\n\nПроверь свою ауру в @твой_бот`;
+  if (tg?.switchInlineQuery) {
+    tg.switchInlineQuery(text);
+  } else {
+    navigator.clipboard?.writeText(text);
+    alert('Скопировано в буфер обмена!');
+  }
+}
+
+// Заполняем данные
 if (ratings.length > 0) {
-  const avg = (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1);
+  const avg = (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1);
   const max = Math.max(...ratings);
   const min = Math.min(...ratings);
+  const highCount = ratings.filter(r => r >= 6).length;
+  const percentHigh = Math.round((highCount / ratings.length) * 100);
 
   document.getElementById('avgScore').textContent = avg;
   document.getElementById('totalRatings').textContent = ratings.length;
   document.getElementById('maxScore').textContent = max;
   document.getElementById('minScore').textContent = min;
-  document.getElementById('auraPoints').innerHTML = aura + ' <span>aura points</span>';
+  document.getElementById('auraPoints').innerHTML = aura + ' <span>pts</span>';
+  document.getElementById('percentHigh').textContent = percentHigh + '%';
 
-  // Прогресс бар (максимум 1000 очков)
-  const progress = Math.min((aura / 1000) * 100, 100);
+  // Конфетти если оценка высокая
+  if (parseFloat(avg) >= 7) setTimeout(launchConfetti, 800);
+
+  // Последние оценки
+  const last3 = ratings.slice(-3);
+  const recentEl = document.getElementById('recentItems');
+  recentEl.innerHTML = last3.map(r => {
+    const cls = r >= 7 ? 'high' : r <= 3 ? 'low' : '';
+    return `<div class="recent-item ${cls}">${r}/10</div>`;
+  }).join('');
+
+  // Уровень
+  const level = getLevel(aura);
+  const badge = document.getElementById('levelBadge');
+  badge.textContent = level.name;
+  badge.className = 'level-badge ' + level.cls;
   setTimeout(() => {
-    document.getElementById('progressFill').style.width = progress + '%';
-  }, 300);
+    document.getElementById('levelFill').style.width = Math.min(level.progress, 100) + '%';
+  }, 600);
+
+  // Прогресс ауры
+  setTimeout(() => {
+    document.getElementById('progressFill').style.width = Math.min((aura / 500) * 100, 100) + '%';
+  }, 400);
 
   // График
   const last20 = ratings.slice(-20);
   const labels = last20.map((_, i) => '#' + (ratings.length - last20.length + i + 1));
-
-  const colors = last20.map(r => {
-    if (r >= 8) return 'rgba(167, 139, 250, 0.9)';
-    if (r >= 6) return 'rgba(108, 99, 255, 0.9)';
-    if (r >= 4) return 'rgba(236, 72, 153, 0.7)';
-    return 'rgba(107, 114, 128, 0.7)';
-  });
+  const barColors = last20.map(r => r >= 8 ? 'rgba(167,139,250,0.9)' : r >= 6 ? 'rgba(108,99,255,0.85)' : r >= 4 ? 'rgba(236,72,153,0.7)' : 'rgba(107,114,128,0.6)');
 
   const ctx = document.getElementById('ratingsChart').getContext('2d');
   new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: labels,
-      datasets: [{
-        data: last20,
-        backgroundColor: colors,
-        borderRadius: 6,
-        borderSkipped: false,
-      }]
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          data: last20,
+          backgroundColor: barColors,
+          borderRadius: 8,
+          borderSkipped: false,
+          order: 2,
+        },
+        {
+          type: 'line',
+          data: last20,
+          borderColor: 'rgba(245,158,11,0.8)',
+          backgroundColor: 'rgba(245,158,11,0.08)',
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: '#f59e0b',
+          fill: true,
+          tension: 0.4,
+          order: 1,
+        }
+      ]
     },
     options: {
       responsive: true,
+      animation: { duration: 1200, easing: 'easeOutQuart' },
       plugins: { legend: { display: false } },
       scales: {
         y: {
           min: 0, max: 10,
-          ticks: { color: '#9ca3af', stepSize: 2 },
+          ticks: { color: '#6b7280', stepSize: 2, font: { size: 11 } },
           grid: { color: 'rgba(255,255,255,0.05)' },
         },
         x: {
-          ticks: { color: '#9ca3af', font: { size: 10 } },
+          ticks: { color: '#6b7280', font: { size: 10 } },
           grid: { display: false },
         }
       }
     }
   });
+
 } else {
-  // Демо данные если нет реальных
+  // Нет данных — демо
   document.getElementById('avgScore').textContent = '—';
-  document.getElementById('totalRatings').textContent = '0';
-  document.getElementById('maxScore').textContent = '—';
-  document.getElementById('minScore').textContent = '—';
+  const level = getLevel(0);
+  document.getElementById('levelBadge').textContent = level.name;
+  document.getElementById('levelBadge').className = 'level-badge ' + level.cls;
 
   const ctx = document.getElementById('ratingsChart').getContext('2d');
   new Chart(ctx, {
     type: 'bar',
     data: {
       labels: ['Нет данных'],
-      datasets: [{ data: [0], backgroundColor: 'rgba(108,99,255,0.3)', borderRadius: 6 }]
+      datasets: [{ data: [0], backgroundColor: 'rgba(108,99,255,0.3)', borderRadius: 8 }]
     },
     options: {
       responsive: true,
       plugins: { legend: { display: false } },
       scales: {
-        y: { min: 0, max: 10, ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-        x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+        y: { min: 0, max: 10, ticks: { color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        x: { ticks: { color: '#6b7280' }, grid: { display: false } }
       }
     }
   });
