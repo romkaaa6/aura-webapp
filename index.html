@@ -377,7 +377,8 @@ body {
     <div class="avg-label">средняя оценка</div>
     <div class="avg-number" id="avgScore">—</div>
     <div class="avg-sub">из 10</div>
-  </div>
+    <div style="margin-top:12px;font-size:13px;color:rgba(255,255,255,0.6)" id="avgEmoji">⭐⭐⭐⭐⭐</div>
+</div>
 
   <div class="stats-row fade-up">
     <div class="stat-box">
@@ -501,19 +502,21 @@ function shareResult() {
   if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
   const avg = ratings.length > 0 ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : '—';
   const level = getLevel(aura);
-  const text = '✨ Моя аура: ' + avg + '/10\n' + level.name + ' | ' + aura + ' aura points\nОценили меня: ' + ratings.length + ' раз\n\nПроверь свою ауру в боте!';
-  if (tg) {
-    tg.close();
-  }
-  if (navigator.share) {
-    navigator.share({ text: text }).catch(() => {});
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => {
-      alert('Текст скопирован! Вставь в любой чат.');
-    });
-  } else {
-    alert(text);
-  }
+  const text = '✨ Моя аура: ' + avg + '/10\n' + level.name + ' | ' + aura + ' aura points\nОценили меня: ' + ratings.length + ' раз';
+  
+  const btn = document.querySelector('.share-btn');
+  btn.textContent = '✅ Скопировано!';
+  setTimeout(() => { btn.textContent = '🚀 Поделиться результатом'; }, 2000);
+
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
 }
 
 // Заполняем данные
@@ -525,6 +528,10 @@ if (ratings.length > 0) {
   const percentHigh = Math.round((highCount / ratings.length) * 100);
 
   document.getElementById('avgScore').textContent = avg;
+  // Эмодзи в зависимости от оценки
+const avgNum = parseFloat(avg);
+const emoji = avgNum >= 9 ? '🔥🔥🔥🔥🔥' : avgNum >= 7 ? '⭐⭐⭐⭐⭐' : avgNum >= 5 ? '✨✨✨' : '💫💫';
+document.getElementById('avgEmoji').textContent = emoji;
   document.getElementById('totalRatings').textContent = ratings.length;
   document.getElementById('maxScore').textContent = max;
   document.getElementById('minScore').textContent = min;
