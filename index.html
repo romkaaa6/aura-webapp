@@ -427,6 +427,21 @@ body {
     </div>
   </div>
 
+  <div class="level-card fade-up" id="raterCard" style="display:none">
+    <div class="level-header">
+      <div class="level-title">⭐ статистика оценщика</div>
+    </div>
+    <div class="stats-row" style="margin-bottom:0">
+      <div class="stat-box">
+        <div class="val" id="ratedCount">0</div>
+        <div class="lbl">оценил анкет</div>
+      </div>
+      <div class="stat-box">
+        <div class="val" id="raterRank">—</div>
+        <div class="lbl">активность</div>
+      </div>
+    </div>
+  </div>
   <div class="aura-card fade-up">
     <div class="aura-top">
       <div class="aura-label">✨ aura points</div>
@@ -545,6 +560,14 @@ document.getElementById('avgEmoji').textContent = emoji;
   document.getElementById('minScore').textContent = min;
   document.getElementById('auraPoints').innerHTML = aura + ' <span>pts</span>';
   document.getElementById('percentHigh').textContent = percentHigh + '%';
+  // Статистика оценщика
+  const ratedCount = parseInt(params.get('rated_count')) || 0;
+  if (ratedCount > 0) {
+    document.getElementById('raterCard').style.display = 'block';
+    document.getElementById('ratedCount').textContent = ratedCount;
+    const rank = ratedCount >= 100 ? 'Эксперт' : ratedCount >= 50 ? 'Активный' : ratedCount >= 10 ? 'Новичок' : 'Начинающий';
+    document.getElementById('raterRank').textContent = rank;
+  }
 
   // Конфетти если оценка высокая
   if (parseFloat(avg) >= 7) setTimeout(launchConfetti, 800);
